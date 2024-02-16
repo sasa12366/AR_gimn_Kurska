@@ -10,24 +10,49 @@
                 init: function () {
                     var marker = this.el;
                     this.vid = document.querySelector("#vid");
+                    var self = this;
 
                     marker.addEventListener('markerFound', function () {
-                        this.toggle = true;
-                        this.vid.play();
-                    }.bind(this));
+                        self.toggle = true;
+                        self.vid.play();
+                    });
 
                     marker.addEventListener('markerLost', function () {
-                        this.toggle = false;
-                        this.vid.pause();
-                    }.bind(this));
+                        self.toggle = false;
+                        self.vid.pause();
+                    });
 
-                    // Получаем доступ к видеопотоку с камеры без указания разрешения
-                    navigator.mediaDevices.getUserMedia({ video: true })
-                        .then(stream => {
-                            this.vid.srcObject = stream;
+                    // Получаем доступ к видеопотоку с камеры с возможностью выбора устройства
+                    navigator.mediaDevices.enumerateDevices()
+                        .then(function(devices) {
+                            var videoDevices = devices.filter(function(device) {
+                                return device.kind === 'videoinput';
+                            });
+
+                            // Создаем список камер и предоставляем пользователю выбор
+                            var select = document.createElement('select');
+                            select.addEventListener('change', function(event) {
+                                var deviceId = event.target.value;
+                                navigator.mediaDevices.getUserMedia({ video: { deviceId: deviceId } })
+                                    .then(function(stream) {
+                                        self.vid.srcObject = stream;
+                                    })
+                                    .catch(function(error) {
+                                        console.error('Не удалось получить доступ к камере', error);
+                                    });
+                            });
+
+                            videoDevices.forEach(function(device) {
+                                var option = document.createElement('option');
+                                option.value = device.deviceId;
+                                option.text = device.label || 'Камера ' + (select.children.length + 1);
+                                select.appendChild(option);
+                            });
+
+                            document.body.appendChild(select);
                         })
-                        .catch(err => {
-                            console.error('Не удалось получить доступ к камере', err);
+                        .catch(function(error) {
+                            console.error('Ошибка при получении списка устройств', error);
                         });
                 },
             });
