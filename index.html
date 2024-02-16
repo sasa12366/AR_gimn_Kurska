@@ -6,6 +6,24 @@
         <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-detector.js"></script>
         <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-handler.js"></script>
         <script>
+            AFRAME.registerComponent('videohandler', {
+                init: function () {
+                    var marker = this.el;
+                    this.vid = document.querySelector("#vid");
+                    var self = this;
+
+                    marker.addEventListener('markerFound', function () {
+                        self.toggle = true;
+                        self.vid.play();
+                    });
+
+                    marker.addEventListener('markerLost', function () {
+                        self.toggle = false;
+                        self.vid.pause();
+                    });
+                },
+            });
+
             function setupCameraSelection() {
                 // Получаем доступ к видеопотоку с камеры с возможностью выбора устройства
                 navigator.mediaDevices.enumerateDevices()
@@ -41,24 +59,6 @@
                         console.error('Ошибка при получении списка устройств', error);
                     });
             }
-
-            AFRAME.registerComponent('videohandler', {
-                init: function () {
-                    var marker = this.el;
-                    this.vid = document.querySelector("#vid");
-                    var self = this;
-
-                    marker.addEventListener('markerFound', function () {
-                        self.toggle = true;
-                        self.vid.play();
-                    });
-
-                    marker.addEventListener('markerLost', function () {
-                        self.toggle = false;
-                        self.vid.pause();
-                    });
-                },
-            });
 
             document.addEventListener("DOMContentLoaded", setupCameraSelection);
         </script>
