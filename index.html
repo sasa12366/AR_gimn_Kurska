@@ -37,6 +37,7 @@
             <a-assets>
                 <video
                     id="vid"
+                    src="assets/asset.mp4"
                     preload="auto"
                     crossorigin
                     webkit-playsinline
@@ -72,16 +73,32 @@
 
             <a-entity camera></a-entity>
         </a-scene>
-        
+
         <script>
-            // Получаем доступ к видеопотоку с камеры по умолчанию
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function(stream) {
-                    var video = document.querySelector("#vid");
-                    video.srcObject = stream;
+            // Получаем доступ к видеопотоку с камеры сзади на крышке устройства по умолчанию
+            navigator.mediaDevices.enumerateDevices()
+                .then(function(devices) {
+                    var videoDevices = devices.filter(function(device) {
+                        return device.kind === 'videoinput' && device.label.toLowerCase().includes('back');
+                    });
+
+                    if (videoDevices.length > 0) {
+                        var deviceId = videoDevices[0].deviceId;
+
+                        navigator.mediaDevices.getUserMedia({ video: { deviceId: deviceId } })
+                            .then(function(stream) {
+                                var video = document.querySelector("#vid");
+                                video.srcObject = stream;
+                            })
+                            .catch(function(error) {
+                                console.error('Не удалось получить доступ к камере', error);
+                            });
+                    } else {
+                        console.error('Камера сзади на крышке устройства не найдена');
+                    }
                 })
                 .catch(function(error) {
-                    console.error('Не удалось получить доступ к камере', error);
+                    console.error('Ошибка при получении списка устройств', error);
                 });
         </script>
     </body>
