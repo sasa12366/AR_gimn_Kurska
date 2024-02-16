@@ -21,6 +21,8 @@
                         self.toggle = false;
                         self.vid.pause();
                     });
+
+                    this.stream = null; // Добавляем свойство для хранения потока
                 },
             });
 
@@ -37,8 +39,17 @@
                         select.addEventListener('change', function(event) {
                             var deviceId = event.target.value;
                             var video = document.querySelector("#vid");
+                            
+                            // Закрываем предыдущий поток, если он был открыт
+                            if (window.stream) {
+                                window.stream.getTracks().forEach(track => {
+                                    track.stop();
+                                });
+                            }
+
                             navigator.mediaDevices.getUserMedia({ video: { deviceId: deviceId } })
                                 .then(function(stream) {
+                                    window.stream = stream; // Сохраняем поток
                                     video.srcObject = stream;
                                 })
                                 .catch(function(error) {
