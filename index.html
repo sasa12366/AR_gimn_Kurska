@@ -21,8 +21,8 @@
                         this.vid.pause();
                     }.bind(this));
 
-                    // Получаем доступ к видеопотоку с камеры
-                    navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1280 }, height: { ideal: 720 } } })
+                    // Получаем доступ к видеопотоку с камеры без указания разрешения
+                    navigator.mediaDevices.getUserMedia({ video: true })
                         .then(stream => {
                             this.vid.srcObject = stream;
                         })
