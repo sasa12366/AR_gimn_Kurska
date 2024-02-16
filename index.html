@@ -44,9 +44,8 @@
                     crossorigin
                     webkit-playsinline
                     autoplay
-                    muted
-                    playsinline
                 ></video>
+                <audio id="audio" src="assets/asset.mp4"></audio>
             </a-assets>
 
             <a-marker
@@ -70,6 +69,7 @@
                     rotation="-90 0 0"
                     class="clickable"
                     gesture-handler
+                    sound="src: #audio"
                 ></a-video>
             </a-marker>
 
