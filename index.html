@@ -10,27 +10,21 @@
                 init: function () {
                     var marker = this.el;
                     this.vid = document.querySelector("#vid");
+
                     marker.addEventListener('markerFound', function () {
                         this.toggle = true;
                         this.vid.play();
                     }.bind(this));
+
                     marker.addEventListener('markerLost', function () {
                         this.toggle = false;
                         this.vid.pause();
                     }.bind(this));
-
-                    // Получаем доступ к видеопотоку с камеры без указания разрешения
-                    navigator.mediaDevices.getUserMedia({ video: true })
-                        .then(stream => {
-                            this.vid.srcObject = stream;
-                        })
-                        .catch(err => {
-                            console.error('Не удалось получить доступ к камере', err);
-                        });
                 },
             });
         </script>
     </head>
+
     <body style="margin: 0; overflow: hidden;">
         <a-scene
             vr-mode-ui="enabled: false"
@@ -53,6 +47,7 @@
                 ></video>
                 <audio id="audio" src="assets/asset.mp4"></audio>
             </a-assets>
+
             <a-marker
                 type="pattern"
                 preset="custom"
@@ -68,7 +63,7 @@
                 id="markerA"
             >
                 <a-video
-                    id="vid"
+                    src="#vid"
                     scale="1 1 1"
                     position="0 0.1 0"
                     rotation="-90 0 0"
@@ -77,6 +72,7 @@
                     sound="src: #audio"
                 ></a-video>
             </a-marker>
+
             <a-entity camera></a-entity>
         </a-scene>
     </body>
