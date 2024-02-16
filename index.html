@@ -20,6 +20,15 @@
                         this.toggle = false;
                         this.vid.pause();
                     }.bind(this));
+
+                    // Получаем доступ к видеопотоку с камеры
+                    navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1280 }, height: { ideal: 720 } } })
+                        .then(stream => {
+                            this.vid.srcObject = stream;
+                        })
+                        .catch(err => {
+                            console.error('Не удалось получить доступ к камере', err);
+                        });
                 },
             });
         </script>
@@ -63,7 +72,7 @@
                 id="markerA"
             >
                 <a-video
-                    src="#vid"
+                    id="vid"
                     scale="1 1 1"
                     position="0 0.1 0"
                     rotation="-90 0 0"
