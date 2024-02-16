@@ -10,68 +10,18 @@
                 init: function () {
                     var marker = this.el;
                     this.vid = document.querySelector("#vid");
-                    var self = this;
 
                     marker.addEventListener('markerFound', function () {
-                        self.toggle = true;
-                        self.vid.play();
-                    });
+                        this.toggle = true;
+                        this.vid.play();
+                    }.bind(this));
 
                     marker.addEventListener('markerLost', function () {
-                        self.toggle = false;
-                        self.vid.pause();
-                    });
-
-                    this.stream = null; // Добавляем свойство для хранения потока
+                        this.toggle = false;
+                        this.vid.pause();
+                    }.bind(this));
                 },
             });
-
-            function setupCameraSelection() {
-                // Получаем доступ к видеопотоку с камеры с возможностью выбора устройства
-                navigator.mediaDevices.enumerateDevices()
-                    .then(function(devices) {
-                        var videoDevices = devices.filter(function(device) {
-                            return device.kind === 'videoinput';
-                        });
-
-                        // Создаем список камер и предоставляем пользователю выбор
-                        var select = document.createElement('select');
-                        select.addEventListener('change', function(event) {
-                            var deviceId = event.target.value;
-                            var video = document.querySelector("#vid");
-                            
-                            // Закрываем предыдущий поток, если он был открыт
-                            if (window.stream) {
-                                window.stream.getTracks().forEach(track => {
-                                    track.stop();
-                                });
-                            }
-
-                            navigator.mediaDevices.getUserMedia({ video: { deviceId: deviceId } })
-                                .then(function(stream) {
-                                    window.stream = stream; // Сохраняем поток
-                                    video.srcObject = stream;
-                                })
-                                .catch(function(error) {
-                                    console.error('Не удалось получить доступ к камере', error);
-                                });
-                        });
-
-                        videoDevices.forEach(function(device) {
-                            var option = document.createElement('option');
-                            option.value = device.deviceId;
-                            option.text = device.label || 'Камера ' + (select.children.length + 1);
-                            select.appendChild(option);
-                        });
-
-                        document.body.appendChild(select);
-                    })
-                    .catch(function(error) {
-                        console.error('Ошибка при получении списка устройств', error);
-                    });
-            }
-
-            document.addEventListener("DOMContentLoaded", setupCameraSelection);
         </script>
     </head>
 
@@ -87,15 +37,13 @@
             <a-assets>
                 <video
                     id="vid"
-                    src="assets/asset.mp4"
                     preload="auto"
-                    response-type="arraybuffer"
-                    loop
                     crossorigin
                     webkit-playsinline
                     autoplay
+                    muted
+                    playsinline
                 ></video>
-                <audio id="audio" src="assets/asset.mp4"></audio>
             </a-assets>
 
             <a-marker
@@ -113,17 +61,28 @@
                 id="markerA"
             >
                 <a-video
-                    id="vid"
+                    src="#vid"
                     scale="1 1 1"
                     position="0 0.1 0"
                     rotation="-90 0 0"
                     class="clickable"
                     gesture-handler
-                    sound="src: #audio"
                 ></a-video>
             </a-marker>
 
             <a-entity camera></a-entity>
         </a-scene>
+        
+        <script>
+            // Получаем доступ к видеопотоку с камеры по умолчанию
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    var video = document.querySelector("#vid");
+                    video.srcObject = stream;
+                })
+                .catch(function(error) {
+                    console.error('Не удалось получить доступ к камере', error);
+                });
+        </script>
     </body>
 </html>
